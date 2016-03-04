@@ -15,6 +15,7 @@
     languageList.appendChild(tag);
   });
 
+  // Split out to helper functions if time
   searchBar.addEventListener("keyup", function(event){
 
     var keyNumber = event.keyCode;
@@ -50,8 +51,14 @@
 
     } else if (keyNumber === 13) {
       var activeLanguage = document.querySelector('.active');
-      searchBar.value = activeLanguage.innerHTML 
-   
+      searchBar.value = activeLanguage.innerHTML; 
+      
+      languageNodes.forEach(function(languageTag){
+        languageTag.setAttribute('class', 'HIDDEN');
+        languageTag.style.display = 'none';
+      });
+
+
     } else {
       languageNodes.forEach(function(languageTag){
         var languageText = languageTag.innerHTML.toUpperCase();
