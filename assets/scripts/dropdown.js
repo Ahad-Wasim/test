@@ -1,8 +1,9 @@
 
 
 (function(){
-  
+
   window.DropDown = function(languages){
+    
     var searchBar = document.querySelector('#search');
     var languageList = document.getElementById("languageList");
     var active = {
@@ -10,12 +11,30 @@
       lang: void 0
     };
 
+
+    var helper = {
+      dispatchDirection: function(direction, active, visibleLanguages){
+        if(direction === 'UP'){
+          active.lang = visibleLanguages[active.index+=1];
+          active.lang.setAttribute('class','VISIBLE active');
+          active.lang.style.background = 'blue';
+        } else if(direction === 'DOWN') {
+          active.lang = visibleLanguages[active.index-=1];
+          active.lang.setAttribute('class','VISIBLE active');
+          active.lang.style.background = 'blue';
+        }
+        
+      }
+    }
+
     languages.forEach(function(language){
       var tag = document.createElement("LI");
       tag.setAttribute('class', 'VISIBLE');
       tag.appendChild(document.createTextNode(language));
       languageList.appendChild(tag);
     });
+
+
 
     // Split out to helper functions if time
     searchBar.addEventListener("keyup", function(event){
@@ -33,9 +52,7 @@
           active.lang.setAttribute('class', 'VISIBLE');
           active.lang.style.background = 'none';
         } 
-        active.lang = visibleLanguages[active.index+=1];
-        active.lang.setAttribute('class','VISIBLE active');
-        active.lang.style.background = 'blue';
+        helper.dispatchDirection('UP', active, visibleLanguages )
 
       } else if (keyNumber === 38){
        
@@ -45,11 +62,8 @@
           active.lang.setAttribute('class', 'VISIBLE');
           active.lang.style.background = 'none';
         } 
-        active.lang = visibleLanguages[active.index-=1];
-        active.lang.setAttribute('class','VISIBLE active');
-        active.lang.style.background = 'blue';
 
-
+        helper.dispatchDirection('DOWN', active, visibleLanguages )
 
       } else if (keyNumber === 13) {
         var activeLanguage = document.querySelector('.active');
@@ -77,7 +91,6 @@
       }
 
     })
-
 
     languageList.addEventListener('click', function(event){
       if(event.target.tagName === "LI"){
