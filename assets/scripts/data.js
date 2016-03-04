@@ -1,6 +1,4 @@
-// At some point needs to passed down to dropdown function
-(function(){
-  window.languages = [
+window.languages = [
     "ActionScript",
     "AppleScript",
     "Asp",
@@ -23,6 +21,8 @@
     "Ruby",
     "Scala",
     "Scheme"
-  ]; 
-}())
+];
+
+DropDown(languages); 
+
 
