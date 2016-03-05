@@ -66,7 +66,9 @@ class DropDown {
   }
 
   filterTags({ allParagraphTags, keyValue }){
-
+    this.active.index = -1;
+    this.toggleOff();
+    
     allParagraphTags.forEach(function(soloTag){
       var text = soloTag.innerHTML.toUpperCase();
       
@@ -97,8 +99,6 @@ class DropDown {
 
   }
 
-
-
   getKeyDownConstants(e){
     
     let visibleTags = [...document.querySelectorAll('.VISIBLE')];
@@ -115,17 +115,21 @@ class DropDown {
 
   }
 
-
-
   keyDownListener(){
       this.searchBar.addEventListener("keyup", this.getKeyDownConstants.bind(this));
   }
 
   clickListener(){
+    let allParagraphTags = [...document.getElementsByTagName("p")];
+
     this.container.addEventListener('click', (event) => {
       if(event.target.tagName === "P"){
         this.searchBar.value = event.target.innerText;
-      } 
+        allParagraphTags.forEach((soloTag) => {
+          soloTag.setAttribute('class', 'HIDDEN');
+          soloTag.style.display = 'none';  
+        });
+      }
     });  
   }
 
@@ -134,29 +138,3 @@ class DropDown {
 export default DropDown
 
 
-
-//     var helper = {
-//       dispatchDirection: function(direction, active, visibleLanguages){
-//         if(direction === 'UP'){
-//           active.lang = visibleLanguages[active.index+=1];
-//           active.lang.setAttribute('class','VISIBLE active');
-//           active.lang.style.background = 'blue';
-//         } else if(direction === 'DOWN') {
-//           active.lang = visibleLanguages[active.index-=1];
-//           active.lang.setAttribute('class','VISIBLE active');
-//           active.lang.style.background = 'blue';
-//         }
-//       },
-
-//     }
-
-
-
-//     languageList.addEventListener('click', function(event){
-//       if(event.target.tagName === "LI"){
-//         searchBar.value = event.target.innerText;
-//       } 
-//     });
-//   }
-  
-// }.call(this));
