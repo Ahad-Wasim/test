@@ -1,12 +1,61 @@
 * {
   margin:0px;
   padding:0px;
+  font-family: Arial, Georgia, Serif;
 }
 
-p {
+#MAIN-HEADER {
+  text-align: center;
+}
+
+#DropDown {
+  width:100%;
+  border:1px solid black;
+}
+
+#DropDown-Wrapper {
+  display: table;
+  margin-top:20px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.SearchBar {
+  margin-bottom: 10px;
+  margin-left:15px;
+  width:235px;
+  padding-top:5px;
+  padding-bottom:5px;
+}
+
+.TAGS {
+  border:1px solid gray;
+  width:300px;
+  padding:2px;
   cursor:pointer;
 }
 
+.TAGS:nth-child(even){
+  background-color: rgba(128, 128, 128, 0.15);
+}
 
+.VISIBLE {
+  display: block;
+}
+
+.HIDE {
+  display: none;
+}
+
+
+
+#DropDown-Wrapper .ACTIVE {
+  background-color: blue;
+  color:white;
+}
+
+.TAG:hover {
+  cursor: pointer;
+}
 
 

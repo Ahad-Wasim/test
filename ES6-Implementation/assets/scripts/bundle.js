@@ -74,12 +74,12 @@
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	var DropDown = function () {
-	  function DropDown(collection, parentNode) {
+	  function DropDown(data, parentNode) {
 	    _classCallCheck(this, DropDown);
 
-	    this.tagCollection = collection;
+	    this.tagData = data;
 	    this.searchBar = document.createElement("INPUT");
-	    this.container = parentNode;
+	    this.parentContainer = parentNode;
 	    this.active = { index: -1, currentTag: void 0 };
 	  }
 
@@ -88,128 +88,176 @@
 	    value: function createDropDown() {
 	      var _this = this;
 
-	      this.container.appendChild(this.searchBar);
+	      // Setting Up the Search Bar
+	      var tags = document.createElement("LABEL");
+	      tags.appendChild(document.createTextNode('TAGS:'));
 
-	      this.tagCollection.forEach(function (data) {
+	      // Adding classes to Parent Container and Search Bar
+	      this.parentContainer.setAttribute('class', 'Tag-Container');
+	      this.searchBar.setAttribute('class', 'SearchBar');
+
+	      // Connecting SearchBar to Parent Container
+	      this.parentContainer.appendChild(this.searchBar);
+	      this.parentContainer.insertBefore(tags, this.parentContainer.childNodes[0]);
+
+	      // Looping through passedIn Data. Appending it to DOM
+	      this.tagData.forEach(function (data) {
 	        var tag = document.createElement("P");
-	        tag.setAttribute('class', 'VISIBLE');
 	        tag.appendChild(document.createTextNode(data));
-	        _this.container.appendChild(tag);
+	        tag.setAttribute('class', 'TAGS VISIBLE');
+	        _this.parentContainer.appendChild(tag);
 	      });
 
+	      // Update the global store
+	      this.updateStore();
+
+	      // Setting Up Event Listeners
 	      this.keyDownListener();
 	      this.clickListener();
+	      this.hoverListener();
 	    }
 	  }, {
-	    key: "toggleOff",
-	    value: function toggleOff() {
-	      if (this.active.index === -1) return;
-	      this.active.currentTag.setAttribute('class', 'VISIBLE');
-	      this.active.currentTag.style.background = 'none';
+	    key: "updateStore",
+	    value: function updateStore() {
+	      this.allDropDownTags = [].concat(_toConsumableArray(document.querySelectorAll('.TAGS')));
+	      this.visibleTags = [].concat(_toConsumableArray(document.querySelectorAll('.VISIBLE')));
+	    }
+
+	    // After something has been clicked reset your active
+
+	  }, {
+	    key: "resetActive",
+	    value: function resetActive() {
+
+	      // If their is an active Tag get rid of it
+	      if (this.active.currentTag) {
+	        var className = this.active.currentTag.className.split(' ').filter(function (word) {
+	          return word !== 'ACTIVE' ? true : false;
+	        }).join(' ');
+
+	        this.active.currentTag.setAttribute('class', className);
+	        this.active = { index: -1, currentTag: void 0 };
+	      }
+	    }
+	  }, {
+	    key: "foundTag",
+	    value: function foundTag() {
+	      this.resetActive();
+
+	      this.allDropDownTags.forEach(function (soloTag) {
+	        soloTag.setAttribute('class', "TAGS HIDE");
+	      });
+
+	      this.updateStore();
+	    }
+
+	    // Allows you to just toggle the previous tag
+
+	  }, {
+	    key: "toggleActive",
+	    value: function toggleActive() {
+	      this.active.currentTag.setAttribute('class', 'TAGS VISIBLE');
 	    }
 	  }, {
 	    key: "dispatchDirection",
 	    value: function dispatchDirection() {
 	      var d = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
-	      var visibleTags = arguments[1];
 
 	      if (d === 'DOWN') {
-	        this.active.currentTag = visibleTags[this.active.index += 1];
+	        this.active.currentTag = this.visibleTags[this.active.index += 1];
 	      } else {
-	        this.active.currentTag = visibleTags[this.active.index -= 1];
+	        this.active.currentTag = this.visibleTags[this.active.index -= 1];
 	      }
-	      this.active.currentTag.setAttribute('class', 'VISIBLE active');
-	      this.active.currentTag.style.background = 'blue';
+	      this.active.currentTag.setAttribute('class', 'TAGS VISIBLE ACTIVE');
 	    }
 	  }, {
 	    key: "enter",
-	    value: function enter(_ref) {
-	      var allParagraphTags = _ref.allParagraphTags;
-	      var keyValue = _ref.keyValue;
-
-	      var activeLanguage = document.querySelector('.active');
-	      this.searchBar.value = activeLanguage.innerHTML;
-
-	      allParagraphTags.forEach(function (soloTag) {
-	        soloTag.setAttribute('class', 'HIDDEN');
-	        soloTag.style.display = 'none';
-	      });
+	    value: function enter() {
+	      var activeTag = document.querySelector('.ACTIVE');
+	      this.searchBar.value = activeTag.innerHTML;
+	      this.foundTag();
 	    }
 	  }, {
 	    key: "upArrow",
-	    value: function upArrow(constants) {
-	      var visibleTags = constants.visibleTags;
-
+	    value: function upArrow() {
 	      if (this.active.index !== 0 && this.active.index !== -1) {
 	        if (this.active.index !== -1) {
-	          this.toggleOff();
+	          this.toggleActive();
 	        }
-	        this.dispatchDirection(void 0, visibleTags);
+	        this.dispatchDirection(void 0);
 	      }
 	    }
 	  }, {
 	    key: "downArrow",
-	    value: function downArrow(constants) {
-	      var visibleTags = constants.visibleTags;
-
-	      if (this.active.index !== visibleTags.length - 1) {
+	    value: function downArrow() {
+	      if (this.active.index !== this.visibleTags.length - 1) {
 	        if (this.active.index !== -1) {
-	          this.toggleOff();
+	          this.toggleActive();
 	        }
-	        this.dispatchDirection('DOWN', visibleTags);
+	        this.dispatchDirection('DOWN');
 	      }
 	    }
 	  }, {
 	    key: "filterTags",
-	    value: function filterTags(_ref2) {
-	      var allParagraphTags = _ref2.allParagraphTags;
-	      var keyValue = _ref2.keyValue;
+	    value: function filterTags() {
+	      var _this2 = this;
 
+	      var exactMatch = false;
 
-	      allParagraphTags.forEach(function (soloTag) {
+	      // Get rid of all the active tags
+	      this.resetActive();
+
+	      this.allDropDownTags.forEach(function (soloTag, i) {
 	        var text = soloTag.innerHTML.toUpperCase();
 
-	        if (text.indexOf(keyValue) === -1) {
-	          soloTag.setAttribute('class', 'HIDDEN');
-	          soloTag.style.display = 'none';
-	        } else if (text.indexOf(keyValue) !== -1 && soloTag.style.display === 'none') {
-	          soloTag.setAttribute('class', 'VISIBLE');
-	          soloTag.style.display = 'block';
+	        if (text.indexOf(_this2.keyValue) === -1) {
+	          soloTag.setAttribute('class', 'TAGS HIDE');
+	        } else if (text === _this2.keyValue) {
+	          _this2.active.currentTag = soloTag;
+	          exactMatch = true;
+	          soloTag.setAttribute('class', 'TAGS VISIBLE ACTIVE');
+	        } else if (text.indexOf(_this2.keyValue) !== -1) {
+	          soloTag.setAttribute('class', 'TAGS VISIBLE');
 	        }
 	      });
+
+	      // Update the store constantly with all the new Visible Tags
+	      this.updateStore();
+
+	      // Tracker for active when visibility matches
+	      if (exactMatch) {
+	        this.visibleTags.forEach(function (visibleTag, i) {
+	          if (visibleTag === _this2.active.currentTag) {
+	            _this2.active.index = i;
+	          }
+	        });
+	      }
 	    }
 	  }, {
 	    key: "keyReducer",
-	    value: function keyReducer(constants) {
-	      var keyNumber = constants.keyNumber;
+	    value: function keyReducer() {
 
-
-	      switch (keyNumber) {
+	      switch (this.keyNumber) {
 	        case 40:
-	          return this.downArrow(constants);
+	          return this.downArrow();
 	        case 38:
-	          return this.upArrow(constants);
+	          return this.upArrow();
 	        case 13:
-	          return this.enter(constants);
+	          return this.enter();
+	        case 37:
+	          return 'NO LEFT ARROW';
+	        case 39:
+	          return 'NO RIGHT ARROW';
 	        default:
-	          this.filterTags(constants);
+	          return this.filterTags();
 	      }
 	    }
 	  }, {
 	    key: "getKeyDownConstants",
 	    value: function getKeyDownConstants(e) {
-
-	      var visibleTags = [].concat(_toConsumableArray(document.querySelectorAll('.VISIBLE')));
-	      var allParagraphTags = [].concat(_toConsumableArray(document.getElementsByTagName("p")));
-
-	      var keyDownData = {
-	        keyNumber: e.keyCode,
-	        keyValue: e.target.value.toUpperCase(),
-	        visibleTags: visibleTags,
-	        allParagraphTags: allParagraphTags
-	      };
-
-	      this.keyReducer(keyDownData);
+	      this.keyNumber = e.keyCode;
+	      this.keyValue = e.target.value.toUpperCase();
+	      this.keyReducer();
 	    }
 	  }, {
 	    key: "keyDownListener",
@@ -219,18 +267,19 @@
 	  }, {
 	    key: "clickListener",
 	    value: function clickListener() {
-	      var _this2 = this;
+	      var _this3 = this;
 
-	      var allParagraphTags = [].concat(_toConsumableArray(document.getElementsByTagName("p")));
-	      this.container.addEventListener('click', function (event) {
+	      this.parentContainer.addEventListener('click', function (event) {
 	        if (event.target.tagName === "P") {
-	          _this2.searchBar.value = event.target.innerText;
-	          allParagraphTags.forEach(function (soloTag) {
-	            soloTag.setAttribute('class', 'HIDDEN');
-	            soloTag.style.display = 'none';
-	          });
+	          _this3.searchBar.value = event.target.innerText;
+	          _this3.foundTag();
 	        }
 	      });
+	    }
+	  }, {
+	    key: "hoverListener",
+	    value: function hoverListener() {
+	      this.parentContainer.addEventListener('mouseover', function (event) {});
 	    }
 	  }]);
 

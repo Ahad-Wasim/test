@@ -1,118 +1,170 @@
 class DropDown {
-  constructor(collection, parentNode){
-    this.tagCollection = collection;
+  constructor(data, parentNode){
+    this.tagData = data;
     this.searchBar = document.createElement("INPUT");
-    this.container = parentNode;
+    this.parentContainer = parentNode;
     this.active = { index:-1, currentTag: void 0 };
   }
 
   createDropDown(){
-    this.container.appendChild(this.searchBar);
 
-    this.tagCollection.forEach((data) => {
+    // Setting Up the Search Bar
+    let tags =  document.createElement("LABEL");
+    tags.appendChild(document.createTextNode('TAGS:'))
+
+    // Adding classes to Parent Container and Search Bar
+    this.parentContainer.setAttribute('class', 'Tag-Container');
+    this.searchBar.setAttribute('class', 'SearchBar');
+
+    // Connecting SearchBar to Parent Container
+    this.parentContainer.appendChild(this.searchBar);
+    this.parentContainer.insertBefore(tags, this.parentContainer.childNodes[0]);
+
+    // Looping through passedIn Data. Appending it to DOM
+    this.tagData.forEach((data) => {
       let tag = document.createElement("P");
-      tag.setAttribute('class', 'VISIBLE');
       tag.appendChild(document.createTextNode(data));
-      this.container.appendChild(tag)
+      tag.setAttribute('class', 'TAGS VISIBLE');
+      this.parentContainer.appendChild(tag);
     });
 
-    this.keyDownListener()
-    this.clickListener() 
+    // Update the global store
+    this.updateStore();
+
+    // Setting Up Event Listeners
+    this.keyDownListener();
+    this.clickListener();
+    this.hoverListener(); 
   }
 
-  toggleOff(){
-    if(this.active.index === -1) return ;
-    this.active.currentTag.setAttribute('class', 'VISIBLE');
-    this.active.currentTag.style.background = 'none'; 
+  updateStore(){
+    this.allDropDownTags = [...document.querySelectorAll('.TAGS')];
+    this.visibleTags = [...document.querySelectorAll('.VISIBLE')];
   }
 
-  dispatchDirection(d=false, visibleTags){
-    if(d === 'DOWN'){
-      this.active.currentTag = visibleTags[this.active.index+=1];  
-    } else {
-      this.active.currentTag = visibleTags[this.active.index-=1]; 
+  // After something has been clicked reset your active
+  resetActive(){
+
+    // If their is an active Tag get rid of it
+    if(this.active.currentTag){
+      let className = this.active.currentTag.className.split(' ').filter(function(word){
+        return word !== 'ACTIVE' ? true : false;
+      }).join(' '); 
+      
+      this.active.currentTag.setAttribute('class', className);
+      this.active = { index:-1, currentTag: void 0 }; 
     }
-    this.active.currentTag.setAttribute('class', 'VISIBLE active');
-    this.active.currentTag.style.background = 'blue';
+
   }
 
-  enter({ allParagraphTags, keyValue }){
-    var activeLanguage = document.querySelector('.active');
-    this.searchBar.value = activeLanguage.innerHTML; 
+  foundTag(){
+    this.resetActive();
         
-    allParagraphTags.forEach(function(soloTag){
-      soloTag.setAttribute('class', 'HIDDEN');
-      soloTag.style.display = 'none';
+    this.allDropDownTags.forEach((soloTag) => {
+      soloTag.setAttribute('class', "TAGS HIDE")
     });
+
+    this.updateStore();
   }
 
-  upArrow(constants){
-    let {visibleTags} = constants;
+  // Allows you to just toggle the previous tag
+  toggleActive(){
+    this.active.currentTag.setAttribute('class', 'TAGS VISIBLE');
+  }
+
+  dispatchDirection(d=false){
+    if(d === 'DOWN'){
+      this.active.currentTag = this.visibleTags[this.active.index+=1];  
+    } else {
+      this.active.currentTag = this.visibleTags[this.active.index-=1]; 
+    }
+    this.active.currentTag.setAttribute('class', 'TAGS VISIBLE ACTIVE');
+  }
+
+  enter(){
+    let activeTag = document.querySelector('.ACTIVE');
+    this.searchBar.value = activeTag.innerHTML;
+    this.foundTag(); 
+  }
+
+
+  upArrow(){
     if(this.active.index !== 0 && this.active.index !== -1 ){
       if(this.active.index !== -1){
-        this.toggleOff();
+        this.toggleActive();
       }
-      this.dispatchDirection(void 0, visibleTags);
+      this.dispatchDirection(void 0);
     }
   }
 
-  downArrow(constants){
-    let {visibleTags} = constants;
-    if(this.active.index !== visibleTags.length-1){
+  downArrow(){
+    if(this.active.index !== this.visibleTags.length-1){
       if(this.active.index !== -1){
-        this.toggleOff();
+        this.toggleActive();
       }
-      this.dispatchDirection('DOWN',visibleTags);
+      this.dispatchDirection('DOWN');
     }
   }
 
-  filterTags({ allParagraphTags, keyValue }){
+  filterTags(){
 
-    allParagraphTags.forEach(function(soloTag){
-      var text = soloTag.innerHTML.toUpperCase();
-      
-      if(text.indexOf(keyValue) === -1){
-        soloTag.setAttribute('class', 'HIDDEN');
-        soloTag.style.display = 'none';
-      } else if(text.indexOf(keyValue) !== -1 && soloTag.style.display === 'none'){
-        soloTag.setAttribute('class', 'VISIBLE');
-        soloTag.style.display = 'block';
+    let exactMatch = false;
+
+    // Get rid of all the active tags
+    this.resetActive();
+
+    this.allDropDownTags.forEach((soloTag, i) => {
+      let text = soloTag.innerHTML.toUpperCase();
+
+      if(text.indexOf(this.keyValue) === -1){
+        soloTag.setAttribute('class', 'TAGS HIDE');
+      } else if(text === this.keyValue){
+        this.active.currentTag = soloTag;
+        exactMatch = true;
+        soloTag.setAttribute('class', 'TAGS VISIBLE ACTIVE');
+      } else if(text.indexOf(this.keyValue) !== -1){  
+        soloTag.setAttribute('class', 'TAGS VISIBLE');
       }
 
     })
+
+    // Update the store constantly with all the new Visible Tags
+    this.updateStore();
+
+    // Tracker for active when visibility matches
+    if(exactMatch){
+      this.visibleTags.forEach((visibleTag, i)=>{
+        if(visibleTag === this.active.currentTag){
+          this.active.index = i;
+        }
+      })
+    }
+
   }
 
-  keyReducer(constants) {
-
-    let {keyNumber} = constants;
+  keyReducer() {
     
-    switch(keyNumber){
+    switch(this.keyNumber){
       case 40:
-        return this.downArrow(constants);
+        return this.downArrow();
       case 38:
-        return this.upArrow(constants);
+        return this.upArrow();
       case 13:
-        return this.enter(constants);
+        return this.enter();
+      case 37:
+        return 'NO LEFT ARROW'; 
+      case 39:
+        return 'NO RIGHT ARROW';
       default:
-        this.filterTags(constants);
+        return this.filterTags();
     }
 
   }
 
   getKeyDownConstants(e){
-    
-    let visibleTags = [...document.querySelectorAll('.VISIBLE')];
-    let allParagraphTags = [...document.getElementsByTagName("p")];
-
-    let keyDownData = {
-      keyNumber: e.keyCode,
-      keyValue : e.target.value.toUpperCase(),
-      visibleTags,
-      allParagraphTags
-    }
-
-    this.keyReducer(keyDownData);
-
+    this.keyNumber = e.keyCode;
+    this.keyValue = e.target.value.toUpperCase();
+    this.keyReducer();
   }
 
   keyDownListener(){
@@ -121,16 +173,18 @@ class DropDown {
 
   clickListener(){
     
-    let allParagraphTags = [...document.getElementsByTagName("p")];
-    this.container.addEventListener('click', (event) => {
+    this.parentContainer.addEventListener('click', (event) => {
       if(event.target.tagName === "P"){
         this.searchBar.value = event.target.innerText;
-        allParagraphTags.forEach((soloTag) => {
-          soloTag.setAttribute('class', 'HIDDEN');
-          soloTag.style.display = 'none';  
-        });
+        this.foundTag();
       }
-    });  
+    });
+  }
+
+  hoverListener(){
+    this.parentContainer.addEventListener('mouseover', (event) => {
+
+    });
   }
 
 }
