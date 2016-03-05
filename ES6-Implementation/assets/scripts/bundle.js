@@ -46,7 +46,7 @@
 
 	"use strict";
 
-	var _dropdown = __webpack_require__(3);
+	var _dropdown = __webpack_require__(1);
 
 	var _dropdown2 = _interopRequireDefault(_dropdown);
 
@@ -58,9 +58,7 @@
 	var test = new _dropdown2.default(languages, container).createDropDown();
 
 /***/ },
-/* 1 */,
-/* 2 */,
-/* 3 */
+/* 1 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -105,6 +103,7 @@
 	  }, {
 	    key: "toggleOff",
 	    value: function toggleOff() {
+	      if (this.active.index === -1) return;
 	      this.active.currentTag.setAttribute('class', 'VISIBLE');
 	      this.active.currentTag.style.background = 'none';
 	    }
@@ -222,9 +221,14 @@
 	    value: function clickListener() {
 	      var _this2 = this;
 
+	      var allParagraphTags = [].concat(_toConsumableArray(document.getElementsByTagName("p")));
 	      this.container.addEventListener('click', function (event) {
 	        if (event.target.tagName === "P") {
 	          _this2.searchBar.value = event.target.innerText;
+	          allParagraphTags.forEach(function (soloTag) {
+	            soloTag.setAttribute('class', 'HIDDEN');
+	            soloTag.style.display = 'none';
+	          });
 	        }
 	      });
 	    }
@@ -234,7 +238,6 @@
 	}();
 
 	exports.default = DropDown;
-
 
 /***/ }
 /******/ ]);

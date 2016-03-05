@@ -21,8 +21,9 @@ class DropDown {
   }
 
   toggleOff(){
+    if(this.active.index === -1) return ;
     this.active.currentTag.setAttribute('class', 'VISIBLE');
-    this.active.currentTag.style.background = 'none';  
+    this.active.currentTag.style.background = 'none'; 
   }
 
   dispatchDirection(d=false, visibleTags){
@@ -82,6 +83,7 @@ class DropDown {
   }
 
   keyReducer(constants) {
+
     let {keyNumber} = constants;
     
     switch(keyNumber){
@@ -96,8 +98,6 @@ class DropDown {
     }
 
   }
-
-
 
   getKeyDownConstants(e){
     
@@ -115,21 +115,26 @@ class DropDown {
 
   }
 
-
-
   keyDownListener(){
-      this.searchBar.addEventListener("keyup", this.getKeyDownConstants.bind(this));
+    this.searchBar.addEventListener("keyup", this.getKeyDownConstants.bind(this));
   }
 
   clickListener(){
+    
+    let allParagraphTags = [...document.getElementsByTagName("p")];
     this.container.addEventListener('click', (event) => {
       if(event.target.tagName === "P"){
         this.searchBar.value = event.target.innerText;
-      } 
+        allParagraphTags.forEach((soloTag) => {
+          soloTag.setAttribute('class', 'HIDDEN');
+          soloTag.style.display = 'none';  
+        });
+      }
     });  
   }
 
 }
 
 export default DropDown
+
 
