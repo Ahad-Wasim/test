@@ -114,7 +114,6 @@
 	      // Setting Up Event Listeners
 	      this.keyDownListener();
 	      this.clickListener();
-	      this.hoverListener();
 	    }
 	  }, {
 	    key: "updateStore",
@@ -275,11 +274,6 @@
 	          _this3.foundTag();
 	        }
 	      });
-	    }
-	  }, {
-	    key: "hoverListener",
-	    value: function hoverListener() {
-	      this.parentContainer.addEventListener('mouseover', function (event) {});
 	    }
 	  }]);
 

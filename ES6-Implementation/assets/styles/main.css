@@ -47,8 +47,6 @@
   display: none;
 }
 
-
-
 #DropDown-Wrapper .ACTIVE {
   background-color: blue;
   color:white;
@@ -57,5 +55,4 @@
 .TAG:hover {
   cursor: pointer;
 }
-
 

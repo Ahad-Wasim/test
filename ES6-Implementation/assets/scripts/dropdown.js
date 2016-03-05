@@ -34,7 +34,6 @@ class DropDown {
     // Setting Up Event Listeners
     this.keyDownListener();
     this.clickListener();
-    this.hoverListener(); 
   }
 
   updateStore(){
@@ -178,12 +177,6 @@ class DropDown {
         this.searchBar.value = event.target.innerText;
         this.foundTag();
       }
-    });
-  }
-
-  hoverListener(){
-    this.parentContainer.addEventListener('mouseover', (event) => {
-
     });
   }
 
